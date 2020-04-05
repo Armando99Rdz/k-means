@@ -44,6 +44,14 @@ def getMatrizGrupos(k, distancias):
 				grupos[f][c] = 0
 	return grupos
 
+def sinCambios(k, m_group_old, m_group_curr):
+	r = 0
+	for f in range(150):
+		for c in range(k):
+			if m_group_old[f][c] != m_group_curr[f][c]:
+				r += 1
+	return r
+
 def k_means(k, D):
 
 	# 1er Paso : Elegir los k centroides iniciales de manera random
@@ -55,19 +63,49 @@ def k_means(k, D):
 		r = rnd.randint(0, 149)
 		centroides[i] = D[r]
 		no_centroides[i] = r
-	print(centroides)
 
-	# 2do Paso : (re)asignar cada objeto al centroide mas cercano
-	distancias = getMatrizDistancias(k, centroides) # calcular la matriz de distancias
-	#print(distancias)
-	grupos = getMatrizGrupos(k, distancias) # calcular la matriz de grupos
-	#print(grupos)
+	sigue = 1
+	cont = 0
+	while (sigue == 1):
+		print('Iteracion: {}'.format(cont))
+		print(centroides)
 
-	# 3er Paso : calcular valor promedio de cada grupo
-	for f in range(150):
+		# 2do Paso : (re)asignar cada objeto al centroide mas cercano
+		distancias = getMatrizDistancias(k, centroides)  # calcular la matriz de distancias
+		grupos = getMatrizGrupos(k, distancias)  # calcular la matriz de grupo
+		print(distancias)
+		if cont > 0:
+			if sinCambios(k, grupos_anterior, grupos) == 0: # la matriz de grupos sin cambios
+				sigue = 0
+				print('Sin Cambios')
+				break
+
+		# 3er Paso : calcular valor promedio de cada grupo
+		n_objetos_grupo = np.zeros((k))
 		for c in range(k):
+			for f in range(150):
+				if grupos[f][c] == 1:
+					n_objetos_grupo[c] += 1 # conteo de objetos en cada grupo
+		#print(n_objetos_grupo)
 
+		# calcular valores promedio
+		prom = np.zeros((k, 4)) # 4 grupos 4 dimensiones
+		for g in range(k): # grupos
+			col = grupos[:, g] # obten la columna entera
+			for x in range(4): # dimensiones
+				for f in range(150): # filas
+					if col[f] == 1:
+						prom[g][x] += D[f][x]
+		for g in range(k): # grupos
+			for d in range(4): # dimensiones
+				prom[g][d] = prom[g][d] / 150
+		#print(prom)
 
+		centroides = prom
+		grupos_anterior = grupos  # matriz de grupo iteracion pasada
+		#print(grupos)
+		#print(distancias)
+		cont += 1
 
 
 print('Algoritmo K-Means | Mineria de Datos | Lenguaje Python')
