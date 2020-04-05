@@ -69,6 +69,7 @@ def k_means(k, D):
 	cont = 0
 	while (sigue == 1):
 		print('Iteracion: {}'.format(cont))
+		print('Centroides: ')
 		print(centroides)
 
 		# FIXME: Los valores terminan en un solo grupo, comunmente a partir de la 1er iteracion.
@@ -89,7 +90,8 @@ def k_means(k, D):
 			for f in range(150):
 				if grupos[f][c] == 1:
 					n_objetos_grupo[c] += 1 # conteo de objetos en cada grupo
-		#print(n_objetos_grupo)
+		for i in range(k):
+			print('Elementos en grupo {}: {}'.format(i, n_objetos_grupo[i]))
 
 		# calcular valores promedio
 		prom = np.zeros((k, 4)) # 4 grupos 4 dimensiones
@@ -106,7 +108,7 @@ def k_means(k, D):
 
 		centroides = prom
 		grupos_anterior = grupos  # matriz de grupo iteracion pasada
-		print(grupos)
+		#print(grupos)
 		#print(distancias)
 		cont += 1
 
