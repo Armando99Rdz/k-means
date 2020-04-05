@@ -26,11 +26,12 @@ def distEuclidiana(p1, p2):
 		r += sum[i]
 	return math.sqrt(r)
 
-def getMatrizDistancias(k, centroides):
+def getMatrizDistancias(k, centroides, no_centroides):
 	distancias = np.zeros((150, k))  # matriz de distancias
 	for c in range(k):
 		for f in range(150):
-			distancias[f][c] = distEuclidiana(centroides[c], D[f])
+			if f != no_centroides[c]:
+				distancias[f][c] = distEuclidiana(centroides[c], D[f])
 	return distancias
 
 def getMatrizGrupos(k, distancias):
@@ -55,8 +56,8 @@ def sinCambios(k, m_group_old, m_group_curr):
 def k_means(k, D):
 
 	# 1er Paso : Elegir los k centroides iniciales de manera random
-	#rnd.seed(time.time())
-	rnd.seed(1)
+	rnd.seed(time.time())
+	#rnd.seed(1)
 	centroides = np.zeros((k, 4)) # matriz de centroides
 	no_centroides = np.zeros(k) # saber la fila de los centroides iniciales
 	for i in range(k):
@@ -70,10 +71,12 @@ def k_means(k, D):
 		print('Iteracion: {}'.format(cont))
 		print(centroides)
 
+		# FIXME: Los valores terminan en un solo grupo, comunmente a partir de la 1er iteracion.
+
 		# 2do Paso : (re)asignar cada objeto al centroide mas cercano
-		distancias = getMatrizDistancias(k, centroides)  # calcular la matriz de distancias
+		distancias = getMatrizDistancias(k, centroides, no_centroides)  # calcular la matriz de distancias
 		grupos = getMatrizGrupos(k, distancias)  # calcular la matriz de grupo
-		print(distancias)
+		#print(distancias)
 		if cont > 0:
 			if sinCambios(k, grupos_anterior, grupos) == 0: # la matriz de grupos sin cambios
 				sigue = 0
@@ -103,7 +106,7 @@ def k_means(k, D):
 
 		centroides = prom
 		grupos_anterior = grupos  # matriz de grupo iteracion pasada
-		#print(grupos)
+		print(grupos)
 		#print(distancias)
 		cont += 1
 
